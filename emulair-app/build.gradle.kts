@@ -120,6 +120,7 @@ dependencies {
     kapt("com.github.bumptech.glide:compiler:4.12.0")
 
 
+
     implementation(deps.libs.material)
     implementation(deps.libs.androidx.navigation.navigationFragment)
     implementation(deps.libs.androidx.navigation.navigationUi)

@@ -15,39 +15,10 @@ import com.bigbratan.emulair.R
 import com.bigbratan.emulair.managerLayout.DynamicGridLayoutManager
 import com.bigbratan.emulair.managerLayout.GridSpaceDecoration
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+import android.widget.EditText
 
-/*class CloudStatesFragment : Fragment() {
-    private lateinit var viewModel: CloudStatesViewModel
-    private lateinit var recyclerView: RecyclerView
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_cloudstates, container, false)
-
-        recyclerView = view.findViewById(R.id.cloudstates_recyclerview)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        Log.d("myapp", "onCreateView: ")
-        val factory = CloudStatesViewModel.Factory(requireActivity().application as EmulairApplication)
-        viewModel = ViewModelProvider(this, factory).get(CloudStatesViewModel::class.java)
-        viewModel.fetchPhotos() // Fetch the list of images
-
-        Log.d("myapp", "onCreateView: ")
-        viewModel.mutableImageList.observe(viewLifecycleOwner, Observer { imageList ->
-            // Update the RecyclerView adapter with the list of images
-            val adapter = ImageAdapter(imageList) // Replace with your own adapter
-            recyclerView.adapter = adapter
-            Log.d("myapp", "adapter set: ")
-        })
-        Log.d("myapp", "before fetchphotos")
-
-        Log.d("myapp", "after fetchphotos")
-        return view
-    }
-    // Rest of your code...
-}*/
 
 class CloudStatesFragment : Fragment(), SelectListener {
     @Inject
@@ -78,16 +49,37 @@ class CloudStatesFragment : Fragment(), SelectListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         val factory = CloudStatesViewModel.Factory(requireActivity().application as EmulairApplication)
         cloudStatesViewModel = ViewModelProvider(this, factory)[CloudStatesViewModel::class.java]
-        cloudStatesViewModel.fetchPhotos()
-        cloudStatesViewModel.CloudStateList.observe(viewLifecycleOwner) { imageList ->
-           Log.d("myapp", "adapter start set:")
-            cloudStatesAdapter = ImageAdapter(/*requireContext().applicationContext,*/ imageList, this )
+        cloudStatesViewModel.fetchPhotos(null)
+        cloudStatesViewModel.getAllFilesNames()
 
-            recyclerView?.adapter = cloudStatesAdapter
-            Log.d("myapp", "adapter end set: ")
+
+        val btnSearch = view.findViewById<View>(R.id.btnSearch)
+        var editTextQuery = view.findViewById<EditText>(R.id.etSearch)
+        btnSearch.setOnClickListener {
+            val query = editTextQuery.text.toString()
+            for (i in cloudStatesViewModel.allFileNames){
+                if (i.contains(query)){
+                    Log.d("myapp", "WITH PARAM" + i)
+                }
+            }
         }
+        //observe the list and notify the adapter when the list changes
+        cloudStatesViewModel.CloudStateList.observe(viewLifecycleOwner) { imageList ->
+            cloudStatesAdapter = ImageAdapter(imageList, this )
+            recyclerView?.adapter = cloudStatesAdapter
+        }
+
+
+
+
+
+
+
+
+
 
 
         recyclerView?.apply {
@@ -96,6 +88,32 @@ class CloudStatesFragment : Fragment(), SelectListener {
             val spacingInPixels = resources.getDimensionPixelSize(R.dimen.grid_spacing)
             GridSpaceDecoration.setSingleGridSpaceDecoration(this, spacingInPixels)
         }
+
+        var visibleItemCount = 0
+        var totalItemCount = 0
+        var loadedItemCount = 0
+
+        recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val visibleItemCount = recyclerView.layoutManager!!.childCount
+                val totalItemCount = recyclerView.layoutManager!!.itemCount
+                val pastVisibleItems = (recyclerView.layoutManager as DynamicGridLayoutManager).findFirstVisibleItemPosition()
+                loadedItemCount = visibleItemCount + pastVisibleItems
+
+                if (visibleItemCount + pastVisibleItems >= totalItemCount && !cloudStatesViewModel.isFetching){
+                    cloudStatesViewModel.fetchPhotos(cloudStatesViewModel.nextPageToken)
+                    cloudStatesAdapter?.notifyDataSetChanged()
+                }
+            }
+        })
+
+
+
+
+
+
 
     }
 

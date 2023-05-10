@@ -32,6 +32,7 @@ object deps {
     object libs {
         object firebase{
             const val firebaseui = "com.firebaseui:firebase-ui-storage:4.3.2"
+
         }
         object androidx {
             object appcompat {
