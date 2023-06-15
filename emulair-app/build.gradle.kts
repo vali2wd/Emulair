@@ -111,6 +111,7 @@ dependencies {
     "nogplayImplementation"(project(":emulair-app-build-nogplay"))
     "gplayImplementation"(project(":emulair-app-build-gplay"))
 
+
     implementation("com.github.bumptech.glide:glide:4.11.0")
     kapt("com.github.bumptech.glide:compiler:4.11.0")
     implementation("com.google.firebase:firebase-storage-ktx:20.0.1")
@@ -133,6 +134,8 @@ dependencies {
     implementation(deps.libs.arch.work.runtime)
     implementation(deps.libs.arch.work.runtimeKtx)
     implementation(deps.libs.androidx.lifecycle.commonJava8)
+    implementation(deps.libs.androidx.lifecycle.lifescope)
+    implementation(deps.libs.androidx.lifecycle.playservices)
     implementation(deps.libs.androidx.lifecycle.reactiveStreams)
     implementation(deps.libs.epoxy.expoxy)
     implementation(deps.libs.epoxy.paging)

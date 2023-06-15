@@ -8,4 +8,12 @@ class CloudState(
     var title: String = title
     var image: Bitmap? = image
 
+    //implement equal on title
+    override fun equals(other: Any?): Boolean {
+        if (other is CloudState) {
+            return title == other.title
+        }
+        return false
+    }
+
 }

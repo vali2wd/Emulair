@@ -56,6 +56,8 @@ object deps {
                 const val processor = "androidx.lifecycle:lifecycle-compiler:${versions.lifecycle}"
                 const val runtime = "androidx.lifecycle:lifecycle-runtime-ktx:${versions.lifecycle}"
                 const val reactiveStreams = "android.arch.lifecycle:reactivestreams:1.1.1"
+                const val lifescope = "androidx.lifecycle:lifecycle-runtime-ktx:2.4.0"
+                const val playservices = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1"
             }
             object preferences {
                 const val preferencesKtx = "androidx.preference:preference-ktx:1.1.1"

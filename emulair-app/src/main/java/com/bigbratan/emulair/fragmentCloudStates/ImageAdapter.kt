@@ -9,6 +9,8 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bigbratan.emulair.R
 import com.bumptech.glide.Glide
@@ -35,7 +37,6 @@ class ImageViewHolder(parent: View, private val selectListener: SelectListener?)
     init {
         textView = itemView.findViewById(R.id.text)
         imageView = itemView.findViewById(R.id.image)
-        progressBar = itemView.findViewById(R.id.pbLoadingCloudStates)
         imageView.setOnClickListener{
             val position = adapterPosition
             if (position != RecyclerView.NO_POSITION) {
@@ -60,15 +61,9 @@ class ImageViewHolder(parent: View, private val selectListener: SelectListener?)
 
 
 
-
 class ImageAdapter(
-    /*private val context: Context,*/
-    private val cloudList: List<CloudState>?,
     private val selectListener: SelectListener?
-
-) : RecyclerView.Adapter<ImageViewHolder>() {
-
-    private var isLoading = false
+): RecyclerView.Adapter<ImageViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
@@ -78,12 +73,50 @@ class ImageAdapter(
         )
     }
 
-
-    override fun getItemCount(): Int {
-        return cloudList?.size ?: 0
-    }
+    override fun getItemCount() = differ.currentList.size
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-         holder.bind(cloudList?.get(position)?.image , cloudList?.get(position)?.title)
+        Log.d("myapp", "Binding item at position $position" + "/"+differ.currentList.size)
+        val cloudState = differ.currentList[position]
+        holder.bind(cloudState.image, cloudState.title)
     }
+    private val differCallBack = object : DiffUtil.ItemCallback<CloudState>() {
+        override fun areItemsTheSame(oldItem: CloudState, newItem: CloudState): Boolean {
+            Log.d("myapp", "areItemsTheSame")
+            return oldItem.title == newItem.title
+        }
+
+        override fun areContentsTheSame(oldItem: CloudState, newItem: CloudState): Boolean {
+            Log.d("myapp", "areContentstheSame")
+            return oldItem == newItem
+        }
+    }
+    val differ = AsyncListDiffer(this, differCallBack)
 }
+
+//class ImageAdapter(
+//    /*private val context: Context,*/
+//    private val cloudList: List<CloudState>?,
+//    private val selectListener: SelectListener?
+//
+//) : RecyclerView.Adapter<ImageViewHolder>() {
+//
+//    private var isLoading = false
+//
+//
+//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
+//        return ImageViewHolder(
+//            LayoutInflater.from(parent.context).inflate(R.layout.layout_image, parent, false),
+//            selectListener
+//        )
+//    }
+//
+//
+//    override fun getItemCount(): Int {
+//        return cloudList?.size ?: 0
+//    }
+//
+//    override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
+//         holder.bind(cloudList?.get(position)?.image , cloudList?.get(position)?.title)
+//    }
+//}
